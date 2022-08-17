@@ -1,4 +1,4 @@
 export default {
-  DOCUMENT_TITLE: 'vue3-admin',
-  LOGIN_TITLE: '管理后台',
+  documentTitle: 'vue3-antd-admin',
+  loginTitle: '管理后台',
 }

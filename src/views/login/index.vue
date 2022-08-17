@@ -5,7 +5,7 @@
     </div>
     <div class="login_right">
       <template v-if="mode === 'login'">
-        <a-typography-title :level="2" class="mb-60">{{ global.LOGIN_TITLE }}</a-typography-title>
+        <a-typography-title :level="2" class="mb-60">{{ global.loginTitle }}</a-typography-title>
         <a-form
           ref="formStateRef"
           :model="formState"

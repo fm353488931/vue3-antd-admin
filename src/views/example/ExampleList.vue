@@ -1,5 +1,11 @@
 <template>
-  <SearchForm :items="items" @onSearch="onSearch" @onReset="getList" />
+  <SearchForm :items="items" @onSearch="onSearch" @onReset="getList">
+    <template #age="{ model, field }">
+      <a-input-number v-model:value="model.ageStart" placeholder="请输入" />
+      -
+      <a-input-number v-model:value="model.ageEnd" placeholder="请输入" />
+    </template>
+  </SearchForm>
   <SearchTable :request="getList" :columns="columns">
     <template #bodyCell="{ column, text, record }">
       <span v-if="column.dataIndex === 'action'">
@@ -38,16 +44,19 @@ const items = [
           value: 2,
         },
       ],
-      onChange: (value, option) => {
-        console.log(this)
-      },
+      onChange: (value, option) => {},
     },
+  },
+  {
+    label: '年龄',
+    field: 'age',
+    slot: 'age',
   },
   {
     label: '预约时间',
     field: 'makeDate',
     component: 'DatePicker',
-    componentProps: {},
+    props: {},
   },
 ]
 const columns = [
@@ -64,9 +73,9 @@ const columns = [
     dataIndex: 'action',
   },
 ]
-const getList = async (res = { current: 1, size: 10 }, searchModel) => {
-  return await $api.common.selectPageCoupon({ params: { ...res, ...searchModel } })
-}
+// const getList = async (res = { current: 1, size: 10 }, searchModel) => {
+//   return await $api.common.selectPageCoupon({ params: { ...res, ...searchModel } })
+// }
 const onSearch = (searchModel) => {
   getList(undefined, searchModel)
 }

@@ -7,8 +7,18 @@
         :label="item.label"
         :name="item.field"
       >
+        <!--判断插槽-->
+        <template v-if="item.slot">
+          <slot
+            :name="item.slot"
+            :model="formModel"
+            :field="item.field"
+            :value="formModel[item.field]"
+          ></slot>
+        </template>
         <component
-          :is="getComponent(item.component)"
+          v-else
+          :is="componentMap[item.component]"
           v-bind="getComponentProps(item)"
           v-model:value="formModel[item.field]"
         />
@@ -23,18 +33,25 @@
   </div>
 </template>
 <script setup>
-import { Input, InputNumber, Select, DatePicker, Radio, Cascader, TimePicker } from 'ant-design-vue'
+import {
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  RangePicker,
+  TimePicker,
+  Radio,
+  Cascader,
+} from 'ant-design-vue'
 const componentMap = {
   Input,
   InputNumber,
   Select,
   DatePicker,
+  RangePicker,
+  TimePicker,
   Radio,
   Cascader,
-  TimePicker,
-}
-const getComponent = (component) => {
-  return componentMap[component]
 }
 const props = defineProps({
   items: {
@@ -42,43 +59,58 @@ const props = defineProps({
     default: () => [],
   },
 })
-const emit = defineEmits(['onSearch', 'onReset'])
 
 const searchForm = ref(null)
-const formModel = reactive({})
+let formModel = ref({})
 
 const getComponentProps = (item) => {
   return {
     style: 'width:250px',
     allowClear: true,
-    placeholder: createPlaceholder(item.component) + item.label,
+    placeholder: createPlaceholder(item),
     ...item.props,
   }
 }
-
-const createPlaceholder = (component) => {
-  if (component === 'Input' || component === 'InputNumber') return '请输入'
-  if (
-    ['Picker', 'Select', 'Checkbox', 'Radio', 'Switch', 'DatePicker', 'TimePicker'].includes(
-      component
-    )
-  ) {
-    return '请选择'
+//创建提示语
+const createPlaceholder = ({ component, label }) => {
+  let placeholder = undefined
+  if (component === 'Input' || component === 'InputNumber') {
+    placeholder = `请输入${label}`
   }
-  return ''
+  if (
+    [
+      'Picker',
+      'Select',
+      'Checkbox',
+      'Radio',
+      'Switch',
+      'DatePicker',
+      'RangePicker',
+      'TimePicker',
+    ].includes(component)
+  ) {
+    placeholder = `请选择${label}`
+  }
+  return placeholder
 }
+
+const emit = defineEmits(['onSearch', 'onReset'])
 //点击查询
 const onSearch = () => {
-  emit('onSearch', formModel)
+  emit('onSearch', formModel.value)
 }
 //点击重置
 const onReset = () => {
   searchForm.value.resetFields()
+  formModel.value = {}
   emit('onReset')
 }
 </script>
 
 <style lang="less" scoped>
 .SearchForm {
+  .ant-form-inline .ant-form-item {
+    margin-bottom: 24px;
+  }
 }
 </style>

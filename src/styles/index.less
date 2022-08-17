@@ -1,10 +1,13 @@
 @import './variables.less';
 @import './reset.less';
 
-@val: 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 40, 50, 60;
+@val: 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 36, 40, 48, 50, 56, 60;
 
 each(@val, {
   //margin
+  .m-@{value} {
+    margin:@value * 1px;
+  }
   .mt-@{value} {
     margin-top:@value * 1px;
   }
@@ -23,11 +26,11 @@ each(@val, {
   .mlr-@{value} {
     margin:0 @value * 1px;
   }
-  .m-@{value} {
-    margin:@value * 1px;
-  }
 
   //padding
+  .p-@{value} {
+    padding: @value * 1px;
+  }
   .pt-@{value} {
     padding-top:@value * 1px;
   }
@@ -46,10 +49,8 @@ each(@val, {
   .plr-@{value} {
     padding: 0 @value * 1px;
   }
-  .p-@{value} {
-    padding: @value * 1px;
-  }
-  
+
+  //fontSize
   .fs-@{value}{
     font-size:@value * 1px;
   }

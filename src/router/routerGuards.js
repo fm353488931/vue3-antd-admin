@@ -49,7 +49,7 @@ export function createRouterGuards(router) {
   })
 
   router.afterEach((to, from) => {
-    document.title = to.meta.title || global.DOCUMENT_TITLE
+    document.title = to.meta.title || global.documentTitle
     NProgress.done()
   })
 
