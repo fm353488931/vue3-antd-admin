@@ -1,5 +1,5 @@
 <template>
-  <div class="breadcrumb">
+  <div class="Breadcrumb">
     <a-button v-if="back" type="link" class="back" @click="$router.back()">
       <left-outlined />返回上一级
     </a-button>
@@ -55,7 +55,7 @@ watch(
 </script>
 
 <style lang="less" scoped>
-.breadcrumb {
+.Breadcrumb {
   display: flex;
   align-items: center;
   margin-bottom: 18px;

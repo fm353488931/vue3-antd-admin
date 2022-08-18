@@ -8,12 +8,13 @@ export function createRouterGuards(router) {
   const whitePathList = ['/login'] //白名单放行
 
   router.beforeEach((to, from, next) => {
-    if (import.meta.env.DEV) {
-      next()
-    }
-
     if (!NProgress.isStarted()) {
       NProgress.start()
+    }
+
+    if (import.meta.env.DEV) {
+      next()
+      return
     }
 
     if (whitePathList.includes(to.path)) {

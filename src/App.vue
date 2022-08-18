@@ -14,7 +14,7 @@ dayjs.locale('zh-cn')
 const locale = zhCN
 
 onMounted(() => {
-  window.addEventListener('resize', debounce(App.setRootFont, 80))
+  window.addEventListener('resize', debounce(App.setRootFont, 150))
 })
 
 onUnmounted(() => {
