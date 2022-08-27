@@ -10,7 +10,6 @@
 <script setup>
 import { getCurrentInstance } from 'vue'
 const instance = getCurrentInstance()
-console.log('instance', instance)
 
 const loading = ref(false)
 const tableElRef = ref(null)
@@ -25,12 +24,14 @@ const pagination = reactive({
 })
 const tableData = ref([])
 
+let searchModel = {}
 //获取列表
-const getList = () => {
-  const request = instance.ctx.$attrs.request
+const getList = (search = {}) => {
+  searchModel = { ...search }
+  const request = instance.proxy.$attrs.request
   if (!request) return
   loading.value = true
-  request({ current: pagination.current, size: pagination.pageSize })
+  request({ ...searchModel, current: pagination.current, size: pagination.pageSize })
     .then((res) => {
       tableData.value = res.data.content
       pagination.total = res.data.total
@@ -45,8 +46,16 @@ getList()
 const changeTable = (page) => {
   pagination.current = page.current
   pagination.pageSize = page.pageSize
+  getList(searchModel)
+}
+
+//重置
+const reload = () => {
+  pagination.current = 1
+  pagination.pageSize = 10
   getList()
 }
+
 //组装表格信息
 const getBindValues = computed(() => {
   return {
@@ -55,8 +64,14 @@ const getBindValues = computed(() => {
     loading,
     rowKey: 'id',
     size: 'middle',
-    ...instance.ctx.$attrs,
+    ...instance.proxy.$attrs,
   }
+})
+
+defineExpose({
+  tableData,
+  getList,
+  reload,
 })
 </script>
 
