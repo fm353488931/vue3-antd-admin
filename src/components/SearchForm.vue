@@ -18,40 +18,23 @@
         </template>
         <component
           v-else
-          :is="componentMap[item.component]"
+          :is="getComponent(item.component)"
           v-bind="getComponentProps(item)"
           v-model:value="formModel[item.field]"
         />
       </a-form-item>
-      <a-form-item>
-        <a-space>
-          <a-button @click="onSearch" type="primary">查询</a-button>
-          <a-button @click="onReset">重置</a-button>
-        </a-space>
-      </a-form-item>
+      <a-space style="margin-left: auto">
+        <a-button @click="onReset">重置</a-button>
+        <a-button @click="onSearch" type="primary">查询</a-button>
+      </a-space>
     </a-form>
   </div>
 </template>
+
 <script setup>
-import {
-  Input,
-  InputNumber,
-  Select,
-  DatePicker,
-  RangePicker,
-  TimePicker,
-  Radio,
-  Cascader,
-} from 'ant-design-vue'
-const componentMap = {
-  Input,
-  InputNumber,
-  Select,
-  DatePicker,
-  RangePicker,
-  TimePicker,
-  Radio,
-  Cascader,
+import { resolveComponent } from 'vue'
+const getComponent = (component) => {
+  return resolveComponent(component)
 }
 const props = defineProps({
   items: {
@@ -59,42 +42,33 @@ const props = defineProps({
     default: () => [],
   },
 })
+const emit = defineEmits(['onSearch', 'onReset'])
 
 const searchForm = ref(null)
 let formModel = ref({})
 
 const getComponentProps = (item) => {
   return {
-    style: 'width:250px',
+    style: { width: '280px' },
     allowClear: true,
     placeholder: createPlaceholder(item),
+    autoComplete: 'off',
     ...item.props,
   }
 }
-//创建提示语
+
 const createPlaceholder = ({ component, label }) => {
   let placeholder = undefined
-  if (component === 'Input' || component === 'InputNumber') {
-    placeholder = `请输入${label}`
-  }
+  if (component === 'AInput' || component === 'AInputNumber') placeholder = '请输入' + label
   if (
-    [
-      'Picker',
-      'Select',
-      'Checkbox',
-      'Radio',
-      'Switch',
-      'DatePicker',
-      'RangePicker',
-      'TimePicker',
-    ].includes(component)
+    ['APicker', 'ASelect', 'ACheckbox', 'ARadio', 'ASwitch', 'ADatePicker', 'ATimePicker'].includes(
+      component
+    )
   ) {
-    placeholder = `请选择${label}`
+    placeholder = '请选择' + label
   }
   return placeholder
 }
-
-const emit = defineEmits(['onSearch', 'onReset'])
 //点击查询
 const onSearch = () => {
   emit('onSearch', formModel.value)
@@ -109,8 +83,12 @@ const onReset = () => {
 
 <style lang="less" scoped>
 .SearchForm {
-  .ant-form-inline .ant-form-item {
-    margin-bottom: 24px;
+  .ant-form {
+    display: flex;
+    align-items: flex-start;
+    .ant-form-item {
+      margin-bottom: 20px;
+    }
   }
 }
 </style>

@@ -1,25 +1,27 @@
 <template>
-  <SearchForm
-    :items="items"
-    @onSearch="onSearch"
-    @onReset="searchTable.reload()"
-    autoComplete="off"
-  >
+  <SearchForm :items="items" @onSearch="onSearch" @onReset="searchTable.reset()">
     <template #age="{ model, field }">
       <a-input-number v-model:value="model.ageStart" placeholder="请输入" />
       -
       <a-input-number v-model:value="model.ageEnd" placeholder="请输入" />
     </template>
   </SearchForm>
-  <a-space class="mb-20">
-    <a-button type="primary">
-      <template #icon>
-        <PlusOutlined />
-      </template>
-      新增
-    </a-button>
-  </a-space>
-  <SearchTable ref="searchTable" :request="getList" :columns="columns">
+  <SearchTable
+    ref="searchTable"
+    :request="request"
+    :columns="columns"
+    :rowKey="(record) => record.id"
+  >
+    <template #tableTop>
+      <a-space>
+        <a-button type="primary">
+          <template #icon>
+            <PlusOutlined />
+          </template>
+          新增
+        </a-button>
+      </a-space>
+    </template>
     <template #bodyCell="{ column, text, record }">
       <span v-if="column.dataIndex === 'action'">
         <a-space>
@@ -32,57 +34,66 @@
 </template>
 
 <script setup>
+import { createVNode } from 'vue'
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { Modal, message } from 'ant-design-vue'
+import $api from '@/api'
+import { useAppStore } from '@/store'
+import Constant from '../../enums/constant'
 import SearchForm from '@/components/SearchForm.vue'
 import SearchTable from '@/components/SearchTable.vue'
-import $api from '@/api'
-import Constant from '../../enums/constant'
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
+
+const appStore = useAppStore()
 
 const searchTable = ref(null)
 
 const items = [
   {
-    label: '所属小区',
-    field: 'communityId',
-    component: 'Select',
+    label: '搜索',
+    field: 'keyword',
+    component: 'AInput',
     props: {
+      placeholder: '请输入关键字',
+      style: {
+        width: '280px',
+      },
+    },
+  },
+  {
+    label: '所属项目',
+    field: 'communityId',
+    component: 'ASelect',
+    props: {
+      options: appStore.communityIdsInfo,
       fieldNames: {
         label: 'name',
         value: 'id',
       },
-      onChange: (value, option) => {},
+      onChange: (value, option) => {
+        console.log(value, option)
+      },
     },
   },
   {
-    label: '性别',
-    field: 'sex',
-    component: 'Select',
+    label: '客户类型',
+    field: 'customerType',
+    component: 'ASelect',
     props: {
-      options: Constant.options.sex,
-      fieldNames: {
-        label: 'label',
-        value: 'value',
-      },
+      options: Constant.options.yesNo,
     },
+  },
+  {
+    label: '时间选择',
+    field: 'dateRange',
+    component: 'ARangePicker',
   },
   {
     label: '年龄',
-    field: '',
     component: 'slot',
     slot: 'age',
   },
-  {
-    label: '搜索',
-    field: 'keyword',
-    component: 'Input',
-    props: {
-      placeholder: '根据姓名/联系方式/具体地址/档案负责人/档案负责人电话/备注模糊搜索',
-      style: {
-        width: '500px',
-      },
-    },
-  },
 ]
+
 const columns = [
   {
     title: '序号',
@@ -90,17 +101,17 @@ const columns = [
     customRender: ({ index }) => `${index + 1}`,
   },
   {
-    title: '姓名',
-    dataIndex: 'name',
+    title: '客户名称',
+    dataIndex: 'customerName',
   },
   {
-    title: '标签',
-    dataIndex: 'label',
-    customRender: ({ record }) => `${record.labelName.join('、')}`,
-  },
-  {
-    title: '所属小区',
+    title: '所属项目',
     dataIndex: 'communityName',
+  },
+  {
+    title: '电话',
+    dataIndex: 'phone',
+    customRender: ({ record }) => `${record.phone}`,
   },
   {
     title: '操作',
@@ -108,25 +119,32 @@ const columns = [
   },
 ]
 
-const getList = async (res = { current: 1, size: 10 }, searchModel) => {
-  return await $api.common.selectPageCoupon({ ...res, ...searchModel })
-}
-const onSearch = (searchModel) => {
-  searchTable.value.getList(searchModel)
+//定义接口
+const request = async (searchModel) => {
+  return await $api.base.customerList({ ...searchModel })
 }
 
+const onSearch = (searchModel) => {
+  searchModel.startTime = searchModel.dateRange
+    ? searchModel.dateRange[0].format('YYYY-MM-DD')
+    : null
+  searchModel.endTime = searchModel.dateRange ? searchModel.dateRange[1].format('YYYY-MM-DD') : null
+  searchTable.value.onSearch({ ...searchModel, dateRange: null })
+}
+
+//编辑
 const editRecord = (record) => {
   console.log(record)
 }
+
+//删除
 const deleteRecord = (record) => {
   Modal.confirm({
-    title: '删除',
-    icon: modal.createVNode(ExclamationCircleOutlined),
-    content: '删除后人员信息将不可恢复，是否确定删除',
-    okText: '确认',
-    cancelText: '取消',
+    title: '确认删除吗？',
+    icon: createVNode(ExclamationCircleOutlined, { style: 'color:#eb4444' }),
+    content: '删除后该条记录不可恢复，是否确定删除？',
     onOk: () => {
-      return $api.personnel.deleteCarePersonnel(record.id).then((res) => {
+      return $api.base.deleteRecord(record.id).then((res) => {
         if (res.ok) {
           message.success('删除成功')
           onSearch()

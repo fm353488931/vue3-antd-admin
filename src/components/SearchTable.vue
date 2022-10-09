@@ -1,5 +1,8 @@
 <template>
   <div class="SearchTable">
+    <div class="mb-20">
+      <slot name="tableTop"></slot>
+    </div>
     <a-table ref="tableElRef" v-bind="getBindValues" @change="changeTable" :loading="loading">
       <template #[item]="data" v-for="item in Object.keys($slots)" :key="item">
         <slot :name="item" v-bind="data"></slot>
@@ -25,16 +28,22 @@ const pagination = reactive({
 const tableData = ref([])
 
 let searchModel = {}
+
 //获取列表
-const getList = (search = {}) => {
-  searchModel = { ...search }
+const getList = (search) => {
+  if (search) {
+    searchModel = { ...search }
+  }
   const request = instance.proxy.$attrs.request
   if (!request) return
   loading.value = true
-  request({ ...searchModel, current: pagination.current, size: pagination.pageSize })
+  request({ current: pagination.current, size: pagination.pageSize, ...searchModel })
     .then((res) => {
-      tableData.value = res.data.content
-      pagination.total = res.data.total
+      tableData.value = res.content
+      pagination.total = res.total
+    })
+    .catch(() => {
+      tableData.value = []
     })
     .finally(() => {
       loading.value = false
@@ -46,14 +55,22 @@ getList()
 const changeTable = (page) => {
   pagination.current = page.current
   pagination.pageSize = page.pageSize
-  getList(searchModel)
+  getList()
+}
+
+//查询
+const onSearch = (search = {}) => {
+  pagination.current = 1
+  pagination.pageSize = 10
+  getList(search)
 }
 
 //重置
-const reload = () => {
+const reset = () => {
   pagination.current = 1
   pagination.pageSize = 10
-  getList()
+  pagination.total = 0
+  getList({})
 }
 
 //组装表格信息
@@ -71,11 +88,9 @@ const getBindValues = computed(() => {
 defineExpose({
   tableData,
   getList,
-  reload,
+  onSearch,
+  reset,
 })
 </script>
 
-<style lang="less" scoped>
-.SearchTable {
-}
-</style>
+<style lang="less" scoped></style>
