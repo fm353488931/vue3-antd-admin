@@ -22,3 +22,4 @@ src/components.d.ts
 *.njsproj
 *.sln
 *.sw?
+*.zip
