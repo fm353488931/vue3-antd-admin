@@ -1,36 +1,38 @@
 <template>
-  <SearchForm :items="items" @onSearch="onSearch" @onReset="searchTable.reset()">
-    <template #age="{ model, field }">
-      <a-input-number v-model:value="model.ageStart" placeholder="请输入" />
-      -
-      <a-input-number v-model:value="model.ageEnd" placeholder="请输入" />
-    </template>
-  </SearchForm>
-  <SearchTable
-    ref="searchTable"
-    :request="request"
-    :columns="columns"
-    :rowKey="(record) => record.id"
-  >
-    <template #tableTop>
-      <a-space>
-        <a-button type="primary">
-          <template #icon>
-            <PlusOutlined />
-          </template>
-          新增
-        </a-button>
-      </a-space>
-    </template>
-    <template #bodyCell="{ column, text, record }">
-      <span v-if="column.dataIndex === 'action'">
+  <div class="ExampleList">
+    <SearchForm :items="items" @onSearch="onSearch" @onReset="searchTable.reset()">
+      <template #age="{ model, field }">
+        <a-input-number v-model:value="model.ageStart" placeholder="请输入" />
+        -
+        <a-input-number v-model:value="model.ageEnd" placeholder="请输入" />
+      </template>
+    </SearchForm>
+    <SearchTable
+      ref="searchTable"
+      :request="request"
+      :columns="columns"
+      :rowKey="(record) => record.id"
+    >
+      <template #tableTop>
         <a-space>
-          <a href="javascript:;" @click="editRecord(record)">编辑</a>
-          <a href="javascript:;" @click="deleteRecord(record)" class="danger">删除</a>
+          <a-button type="primary">
+            <template #icon>
+              <PlusOutlined />
+            </template>
+            新增
+          </a-button>
         </a-space>
-      </span>
-    </template>
-  </SearchTable>
+      </template>
+      <template #bodyCell="{ column, text, record }">
+        <span v-if="column.dataIndex === 'action'">
+          <a-space>
+            <a href="javascript:;" @click="editRecord(record)">编辑</a>
+            <a href="javascript:;" @click="deleteRecord(record)" class="danger">删除</a>
+          </a-space>
+        </span>
+      </template>
+    </SearchTable>
+  </div>
 </template>
 
 <script setup>
@@ -38,12 +40,9 @@ import { createVNode } from 'vue'
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { Modal, message } from 'ant-design-vue'
 import $api from '@/api'
-import { useAppStore } from '@/store'
 import Constant from '../../enums/constant'
 import SearchForm from '@/components/SearchForm.vue'
 import SearchTable from '@/components/SearchTable.vue'
-
-const appStore = useAppStore()
 
 const searchTable = ref(null)
 
@@ -64,7 +63,7 @@ const items = [
     field: 'communityId',
     component: 'ASelect',
     props: {
-      options: appStore.communityIdsInfo,
+      options: [{ id: '1', name: '项目1' }],
       fieldNames: {
         label: 'name',
         value: 'id',

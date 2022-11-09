@@ -1,8 +1,6 @@
 import axios from 'axios'
-import { useMainStore } from '@/store/main'
 import { notification } from 'ant-design-vue'
 
-const mainStore = useMainStore()
 const service = axios.create({
   // baseURL: '',
   headers: {
@@ -12,7 +10,7 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config) => {
-    const token = mainStore.APP_CONFIG.token
+    const token = ''
     if (token) {
       config.headers['Authorization'] = token
     }
@@ -36,7 +34,7 @@ service.interceptors.response.use(
       link.style.display = 'none'
       link.href = url
       let title = response.headers['content-disposition']
-      title = decodeURIComponent(title.substr(21))
+      title = decodeURIComponent(title.substring(21))
       link.setAttribute('download', title)
       document.body.appendChild(link)
       link.click()

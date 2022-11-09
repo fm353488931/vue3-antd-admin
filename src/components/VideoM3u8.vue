@@ -16,6 +16,7 @@
 
 <script setup>
 import Videojs from 'video.js'
+import 'video.js/dist/video-js.css'
 import { nextTick, onMounted, onUnmounted } from 'vue'
 //弹窗
 const url = ref('')

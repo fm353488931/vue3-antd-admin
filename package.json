@@ -11,12 +11,16 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
+    "@wangeditor/editor": "^5.1.22",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "ant-design-vue": "^3.2.12",
     "axios": "^0.27.2",
     "dayjs": "^1.11.5",
     "lodash": "^4.17.21",
+    "naive-ui": "^2.33.5",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.22",
+    "video.js": "^7.20.3",
     "vue": "^3.2.40",
     "vue-router": "^4.1.5"
   },
