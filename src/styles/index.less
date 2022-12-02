@@ -21,10 +21,12 @@ each(@val, {
     margin-left:@value * 1px;
   }
   .mtb-@{value} {
-    margin:@value * 1px 0;
+    margin-top:@value * 1px;
+    margin-bottom:@value * 1px;
   }
   .mlr-@{value} {
-    margin:0 @value * 1px;
+    margin-left:@value * 1px;
+    margin-right:@value * 1px;
   }
 
   //padding
@@ -44,10 +46,12 @@ each(@val, {
     padding-left:@value * 1px;
   }
   .ptb-@{value} {
-    padding: @value * 1px 0;
+    padding-top:@value * 1px;
+    padding-bottom:@value * 1px;
   }
   .plr-@{value} {
-    padding: 0 @value * 1px;
+    padding-left:@value * 1px;
+    padding-right:@value * 1px;
   }
 
   //fontSize
@@ -71,6 +75,10 @@ each(@val, {
   align-items: center;
 }
 
+.flex-auto {
+  flex: auto;
+}
+
 .align-center {
   align-items: center;
 }
@@ -81,10 +89,6 @@ each(@val, {
 
 .justify-between {
   justify-content: space-between;
-}
-
-.flex-auto {
-  flex: auto;
 }
 
 .w-100 {

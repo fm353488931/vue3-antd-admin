@@ -1,6 +1,6 @@
 <template>
   <div class="ExampleList">
-    <SearchForm :items="items" @onSearch="onSearch" @onReset="searchTable.reset()">
+    <SearchForm ref="searchForm" :items="items" @onSearch="onSearch" @onReset="searchTable.reset()">
       <template #age="{ model, field }">
         <a-input-number v-model:value="model.ageStart" placeholder="请输入" />
         -
@@ -44,7 +44,13 @@ import Constant from '../../enums/constant'
 import SearchForm from '@/components/SearchForm.vue'
 import SearchTable from '@/components/SearchTable.vue'
 
+const searchForm = ref(null)
 const searchTable = ref(null)
+
+const changeCommunityId = (value, option) => {
+  console.log(value, option)
+  searchForm.value.formModel.customerType = undefined
+}
 
 const items = [
   {
@@ -68,9 +74,7 @@ const items = [
         label: 'name',
         value: 'id',
       },
-      onChange: (value, option) => {
-        console.log(value, option)
-      },
+      onChange: (value, option) => changeCommunityId(value, option),
     },
   },
   {
@@ -120,7 +124,7 @@ const columns = [
 
 //定义接口
 const request = async (searchModel) => {
-  return await $api.base.customerList({ ...searchModel })
+  return await window.$api.common.selectPageCoupon({ ...searchModel })
 }
 
 const onSearch = (searchModel) => {

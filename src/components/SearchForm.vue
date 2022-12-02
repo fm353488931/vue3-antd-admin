@@ -79,6 +79,10 @@ const onReset = () => {
   formModel.value = {}
   emit('onReset')
 }
+
+defineExpose({
+  formModel,
+})
 </script>
 
 <style lang="less" scoped>
