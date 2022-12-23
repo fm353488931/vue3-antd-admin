@@ -1,80 +1,48 @@
 <template>
   <Teleport :disabled="position === 'absolute'" to="body">
-    <div class="mask" ref="mask" v-show="isShow">
-      <div class="dialog" ref="dialog">
-        <div class="dialog_header">
-          <img :src="icon" alt="" class="mr-12" />
-          <p class="dialog_header_title">{{ title }}</p>
-          <close-outlined style="cursor: pointer" @click="onClose" />
-        </div>
-        <div class="dialog_content">
-          <slot></slot>
+    <Transition name="modal">
+      <div class="dialog_mask" ref="mask" v-if="isShow" @blur="onClose">
+        <div class="dialog_container">
+          <div class="dialog_container_header">
+            <img :src="icon" alt="" class="mr-12" />
+            <span class="dialog_container_header_title">{{ props.title || '标题' }}</span>
+            <close-outlined style="cursor: pointer" @click="onClose" />
+          </div>
+          <div class="dialog_container_body">
+            <slot></slot>
+          </div>
+          <div class="dialog_container_footer">
+            <slot name="footer">
+              <a-space>
+                <a-button type="primary" @click="onClose">确定</a-button>
+                <a-button @click="onClose">取消</a-button>
+              </a-space>
+            </slot>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </Teleport>
 </template>
 
 <script setup>
 import { CloseOutlined } from '@ant-design/icons-vue'
+const props = defineProps({
+  title: String,
+})
 const emit = defineEmits(['close'])
 const mask = ref(null)
-const dialog = ref(null)
-const dialogStyle = ref(null)
-const maskStyle = ref(null)
 const isShow = ref(false)
-const title = ref('')
-const icon = ref(new URL('../../../assets/icons/dangjianxinwen.webp', import.meta.url).href)
+// const icon = ref(new URL('../assets/icons/dialog.png', import.meta.url).href)
 const position = ref('')
-onMounted(() => {
-  mask.value.addEventListener(
-    'click',
-    () => {
-      onClose()
-    },
-    false
-  )
-  dialog.value.addEventListener(
-    'click',
-    (e) => {
-      e.stopPropagation()
-    },
-    false
-  )
-  dialogStyle.value = dialog.value.style
-  maskStyle.value = mask.value.style
-})
 
 const onShow = (obj) => {
   isShow.value = true
-  title.value = obj.title
-  icon.value = obj.icon
-  position.value = obj.position
-  if (position.value === 'absolute') {
-    mask.value.className = ''
-    dialogStyle.value.bottom = '1.2rem'
-    dialogStyle.value.top = 'initial'
-  }
-  dialogStyle.value.width = obj.width
-  dialogStyle.value.height = obj.height
-  dialogStyle.value.transform = 'translate(-50%, -50%) scale(0)'
-  setTimeout(() => {
-    if (position.value === 'absolute') {
-      dialogStyle.value.transform = 'translate(-50%, 0%) scale(1)'
-    } else {
-      dialogStyle.value.transform = 'translate(-50%, -50%) scale(1)'
-    }
-  }, 100)
 }
 const onClose = () => {
   isShow.value = false
-  dialogStyle.value.transform = 'translate(-50%, -50%) scale(0)'
-  const dialog_content = document.querySelector('.dialog_content')
-  dialog_content.scrollTop = 0
   emit('close')
 }
-
-const loading = ref(false)
 
 defineExpose({
   onShow,
@@ -83,54 +51,68 @@ defineExpose({
 </script>
 
 <style lang="less" scoped>
-.mask {
-  position: fixed;
-  // background-color: rgba(0, 0, 0, 0.4);
-  height: 100%;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 1000;
-}
 .dialog {
-  font-size: 0.2rem;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transition: all ease 0.2s;
-  transform: translate(-50%, -50%) scale(0);
-  z-index: 99;
-  display: flex;
-  flex-direction: column;
-  color: #ffffff;
-  width: 9.6rem;
-  height: 6.72rem;
-  padding: 0.12rem;
-  background-image: url(../assets/imgs/dialog_bg.webp);
-  background-size: 100% 100%;
-  &_header {
-    display: flex;
-    align-items: center;
-    padding: 0 0.24rem;
-    width: 100%;
-    height: 0.58rem;
-    background-image: url(../assets/imgs/dialog_header.webp);
-    background-size: 100% 100%;
-    &_title {
-      margin-right: auto;
-      font-family: PingFangSC-Medium;
-      font-weight: 500;
-      font-size: 0.24rem;
-      color: #ffffff;
-      text-shadow: 0 0 0.08rem #2c8df4;
+  &_mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+  }
+  &_container {
+    box-sizing: border-box;
+    position: relative;
+    top: 15vh;
+    margin: 0 auto;
+    width: 5.2rem;
+    max-width: calc(100vw - 0.32rem);
+    background-color: #fff;
+    border-radius: 0.02rem;
+    box-shadow: 0 0.03rem 0.06rem -0.04rem #0000001f, 0 0.06rem 0.16rem #00000014,
+      0 0.09rem 0.28rem 0.08rem #0000000d;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    &_header {
+      display: flex;
+      align-items: center;
+      border-bottom: 0.01rem solid #f0f0f0;
+      padding: 0 0.24rem;
+      height: 0.55rem;
+      &_title {
+        margin-right: auto;
+        font-family: PingFangSC-Medium;
+        font-weight: 500;
+        font-size: 0.16rem;
+        color: @gray26;
+      }
+    }
+    &_body {
+      padding: 0.24rem;
+      word-wrap: break-word;
+    }
+    &_footer {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.1rem 0.16rem;
+      border-top: 0.01rem solid #f0f0f0;
     }
   }
-  &_content {
-    flex: 1;
-    padding: 0.3rem 0.18rem 0;
-    width: 100%;
-    overflow-y: auto;
-  }
+}
+
+.modal-enter-from {
+  opacity: 0;
+}
+
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-from .dialog_container,
+.modal-leave-to .dialog_container {
+  transform: scale(1.1);
 }
 </style>

@@ -21,6 +21,7 @@
             </template>
             新增
           </a-button>
+          <a-button type="primary" @click="openDialog"> 弹窗 </a-button>
         </a-space>
       </template>
       <template #bodyCell="{ column, text, record }">
@@ -32,6 +33,9 @@
         </span>
       </template>
     </SearchTable>
+    <Dialog ref="dialog">
+      <div> content </div>
+    </Dialog>
   </div>
 </template>
 
@@ -40,9 +44,10 @@ import { createVNode } from 'vue'
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { Modal, message } from 'ant-design-vue'
 import $api from '@/api'
-import Constant from '../../enums/constant'
+import Constant from '@/enums/constant'
 import SearchForm from '@/components/SearchForm.vue'
 import SearchTable from '@/components/SearchTable.vue'
+import Dialog from '@/components/Dialog.vue'
 
 const searchForm = ref(null)
 const searchTable = ref(null)
@@ -157,6 +162,12 @@ const deleteRecord = (record) => {
       })
     },
   })
+}
+
+//弹窗
+const dialog = ref(null)
+const openDialog = () => {
+  dialog.value.onShow({})
 }
 </script>
 
